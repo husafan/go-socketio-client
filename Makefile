@@ -8,7 +8,7 @@ build:
 
 # tests all target
 test:
-	bazel test //...
+	bazel test //... --test_output=ALL
 
 # gazelle: automatic generation of Bazel build files
 # https://github.com/bazelbuild/bazel-gazelle

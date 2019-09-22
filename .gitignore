@@ -13,3 +13,6 @@
 
 # Any temp files.
 *~
+
+# Ignore Bazel build directories
+bazel-*
