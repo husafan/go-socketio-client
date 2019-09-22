@@ -62,4 +62,11 @@ func TestBinaryLengthEncoder(t *testing.T) {
 			So(encodedBytes[4:], ShouldResemble, []byte(largeData))
 		})
 	})
+	encoder = &BinaryLengthEncoder{}
+	encodedBytes, err = ioutil.ReadAll(encoder)
+	Convey("Calling BinaryLengthEncoder#Read before ReadFrom", t, func() {
+		Convey("should not be an error", func() {
+			So(encodedBytes, ShouldResemble, []byte{})
+		})
+	})
 }

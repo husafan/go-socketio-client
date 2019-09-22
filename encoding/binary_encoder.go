@@ -7,6 +7,8 @@ import (
 	"strconv"
 )
 
+// Calculates the length prefix bytes given the length of the original
+// data bytes.
 func getLengthBytes(length int) ([]byte, error) {
 	strLength := strconv.FormatInt(int64(length), 10)
 	lengthBytes := make([]byte, len(strLength)+2)
@@ -22,9 +24,10 @@ func getLengthBytes(length int) ([]byte, error) {
 	return lengthBytes, nil
 }
 
-// The binary length encoder is responsible for adding the encoded length bytes
-// to the front of an array of bytes. The JS reference implementation is here:
-// https://github.com/socketio/engine.io-parser/blob/master/lib/index.js
+// The binary length encoder is responsible for adding the encoded
+// length bytes to the front of an array of bytes. The JS reference
+// implementation is here:
+// https://github.com/socketio/engine.io-parser/blob/master/lib/index.js#L386
 //
 // The steps are:
 // 1. Get the length of the data to send as a string.
@@ -38,10 +41,17 @@ type BinaryLengthEncoder struct {
 	readIndex int
 }
 
+// Reads the prefixed bytes passed to the BinaryLengthEncoder.
 func (ble *BinaryLengthEncoder) Read(toFill []byte) (int, error) {
+	if ble.toEncode == nil {
+		return 0, io.EOF
+	}
 	return ble.toEncode.Read(toFill)
 }
 
+// Reads the bytes from reader and calculates the correct length
+// prefix. The length prefix is combined with the original bytes and
+// can be read out via the Read method.
 func (ble *BinaryLengthEncoder) ReadFrom(reader io.Reader) (bytesRead int64, err error) {
 	packetBytes, err := ioutil.ReadAll(reader)
 	if err == nil {
@@ -52,6 +62,8 @@ func (ble *BinaryLengthEncoder) ReadFrom(reader io.Reader) (bytesRead int64, err
 	return int64(len(packetBytes)), err
 }
 
+// Returns a *BinaryLengthEncoder containing the length-prefixed bytes
+// read from the passed in Reader.
 func NewBinaryLengthEncoder(reader io.Reader) *BinaryLengthEncoder {
 	toReturn := &BinaryLengthEncoder{}
 	toReturn.ReadFrom(reader)
